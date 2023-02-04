@@ -118,7 +118,7 @@ cnoremap <expr> %% getcmdtype() == ':' ? expand('%:h').'/' : '%%'
 
 " <C-l>: quick temp disable hlsearch
 nnoremap <silent> <C-l> :<C-u>nohlsearch<CR><C-l>
-
+imap jj <Esc>
 
 " -------------------------------------------------------------------------------
 " Platform
@@ -206,7 +206,6 @@ Plugin 'scrooloose/nerdtree'
 Plugin 'jistr/vim-nerdtree-tabs'
 Plugin 'airblade/vim-gitgutter'
 Plugin 'ervandew/supertab'
-Plugin 'Shougo/neocomplete.vim'  " neocomplete need vim --with-lua
 Plugin 'SirVer/ultisnips'
 Plugin 'honza/vim-snippets'  " needed with SirVer/ultisnips
 Plugin 'AndrewRadev/splitjoin.vim'  " transition between multiline and single-line code
@@ -390,26 +389,6 @@ set completeopt=longest,menu,preview
 let g:SuperTabDefaultCompletionType = "<c-x><c-o>"  " use omni completion instead of default
 let g:SuperTabCrMapping = 1  " disable <enter> with newline, https://github.com/ervandew/supertab/issues/142
 
-" ----------------------------------------------------------------------------
-" Shougo/neocomplete.vim
-" ----------------------------------------------------------------------------
-" Disable AutoComplPop.
-let g:acp_enableAtStartup = 0
-" Use neocomplete.
-let g:neocomplete#enable_at_startup = 1
-" Use smartcase.
-let g:neocomplete#enable_smart_case = 1
-" Set minimum syntax keyword length.
-let g:neocomplete#sources#syntax#min_keyword_length = 3
-let g:neocomplete#lock_buffer_name_pattern = '\*ku\*'
-
-" Define dictionary.
-let g:neocomplete#sources#dictionary#dictionaries = {
-    \ 'default' : '',
-    \ 'vimshell' : $HOME.'/.vimshell_hist',
-    \ 'scheme' : $HOME.'/.gosh_completions'
-        \ }
-
 " Define keyword.
 if !exists('g:neocomplete#keyword_patterns')
     let g:neocomplete#keyword_patterns = {}
@@ -564,7 +543,7 @@ hi ColorColumn ctermbg=lightgrey guibg=lightgrey  " Highlighter cc
 
 try
     set background=dark
-    colorscheme Tomorrow-Night-Bright
+    colorscheme Tomorrow-Night
     " Below syntax will affect vim-airline statusbar; write colorscheme
     " directly is ok
     " autocmd BufEnter * colorscheme Tomorrow-Night-Bright
