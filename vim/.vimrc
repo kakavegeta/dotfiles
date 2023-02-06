@@ -1,6 +1,3 @@
-" Tanky Woo <me@tankywoo.com>
-" https://tankywoo.com
-
 " ===============================================================================
 " Info
 "   leader: default is `\`, detailed with `:help <leader>``
@@ -13,8 +10,10 @@
 
 set nocompatible  " Use the vim's keyboard setting, not vi
 
-if filereadable(expand("~/.vim/vimrc.vundle"))
-  source ~/.vim/vimrc.vundle
+let data_dir = has('nvim') ? stdpath('data') . '/site' : '~/.vim'
+if empty(glob(data_dir . '/autoload/plug.vim'))
+  silent execute '!curl -fLo '.data_dir.'/autoload/plug.vim --create-dirs  https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
+  autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
 endif
 
 set nu  " Set the line number
@@ -23,8 +22,20 @@ syntax on  " Syntax highlighting
 filetype on  " File type detection
 filetype plugin on  " Loading the plugin files for specific file types
 filetype indent on  " Loading the indent file for specific file types with
+set showcmd
+set laststatus=2        " Show the status line at the bottom
+set mouse+=a            " A necessary evil, mouse support
+set noerrorbells visualbell t_vb=    "Disable annoying error noises
+set splitbelow          " Open new vertical split bottom
+set splitright          " Open new horizontal splits right
+set linebreak           " Have lines wrap instead of continue off-screen
+set scrolloff=15        " Keep cursor in approximately the middle of the screen
+set updatetime=100      " Some plugins require fast updatetime
+set ttyfast             " Improve redrawing
+
 
 " Tab and Indent
+""""""""""""""""""""""""""""""""""""""""""""""""""""""
 set tabstop=4
 set softtabstop=4
 set shiftwidth=4
@@ -34,14 +45,44 @@ set autoindent  " Copy indent from current line when starting a new line
 set smartindent
 set cindent
 
+
 " Seach and Match
+"""""""""""""""""""""""""""""""""""""""""
 set hlsearch  " Highlight the search result
 set incsearch  " Real-time search
 set ignorecase
-set smartcase
+set smartcase  " Make case sensitive when there is uppercase
 set showmatch  " When a bracket is inserted, briefly jump to the matching one
+" Turn off search highlight
+vnoremap <C-h> :nohlsearch<cr>
+nnoremap <C-h> :nohlsearch<cr>
+" <C-l>: quick temp disable hlsearch
+nnoremap <silent> <C-l> :<C-u>nohlsearch<CR><C-l>
+
+
+
+" Undo
+"""""""""""""""""""""""""
+set undofile
+set undodir=~/.vim/undodir
+
+
+" Movement
+"""""""""""""""""""""""""
+"hightlight last inserted text
+nnoremap gV `[v`]
+
+" Jump to head and end of line
+map H ^
+map L $
+
+" indents
+vnoremap <Tab> >
+vnoremap <S-Tab> <
+
 
 " Display
+"""""""""""""""""""""""""
 set showmode  " Show the current mode
 set t_Co=256  " If under tty, use 256
 
@@ -51,12 +92,15 @@ set listchars=tab:>-,trail:.
 " Not display above list
 nmap <leader>l :set list!<CR>
 
+
 " Other
 set nobackup
 set fileencodings=utf-8,gb18030,cp936,big5 " Set the encode
 " set pastetoggle=<F10>  " Bind `F10` to `:set paste`
 set pastetoggle=<leader>p
-set backspace=2 " same as ":set backspace=indent,eol,start" in vim7.4
+set backspace=indent,eol,start
+nmap Q <Nop>
+" Q in normal mode enters Ex mode. You almost never want this.
 
 " Press `shift` while selecting with the mouse can disable into visual mode
 " In mac os, hold `alt/option` is easier
@@ -65,6 +109,8 @@ set backspace=2 " same as ":set backspace=indent,eol,start" in vim7.4
 
 set foldmethod=indent  " The kind of folding used for the current window
 set foldlevel=99
+
+
 
 " -------------------------------------------------------------------------------
 " Enhanced
@@ -113,12 +159,69 @@ runtime macros/matchit.vim
 cnoremap <expr> %% getcmdtype() == ':' ? expand('%:h').'/' : '%%'
 
 " -------------------------------------------------------------------------------
-" Bind Keys
+" Custom key binds
 " -------------------------------------------------------------------------------
 
-" <C-l>: quick temp disable hlsearch
-nnoremap <silent> <C-l> :<C-u>nohlsearch<CR><C-l>
-imap jj <Esc>
+let mapleader=" "
+
+" <Esc> remap
+inoremap jj <Esc>
+inoremap jk <Esc>
+
+" quick save
+" nmap <Leader>w :w<CR>
+" nmap <Leader>q :q<CR>
+" nmap <Leader>wq :wq<CR>
+" nmap <Leader>Q :q!<CR>
+
+" Quick copy/paste to system clipboard
+nmap <Leader>y "+y
+nmap <Leader>d "+d
+vmap <Leader>y "+y
+vmap <Leader>d "+d
+nmap <Leader>p "+p
+nmap <Leader>P "+P
+vmap <Leader>p "+p
+vmap <Leader>P "+P
+
+
+"  ;  --   FZF
+nmap <Leader>; :Buffers<CR>
+
+"  e g H -- FZF
+nnoremap <Leader>g :Rg<CR>
+nnoremap <Leader>e :Files<CR>
+nnoremap <Leader>H :History<CR>
+
+"  <Space>  --  <leader><leader> toggles between buffers
+nnoremap <Leader><Leader> <c-^>
+
+" toggles
+nnoremap <Leader>ob :ToggleBlameLine<CR>
+nnoremap <Leader>og :GitGutterToggle<CR>
+nnoremap <Leader>oa :ALEToggle<CR>
+nnoremap <Leader>oe :NERDTreeToggle<CR>
+nnoremap <Leader>of :ALEfixToggle<CR>
+
+" ------------------------------------------------------------------------------
+" # Autocommands
+" ------------------------------------------------------------------------------
+
+" Prevent accidental writes to buffers that shouldn't be edited
+autocmd BufRead *.orig set readonly
+autocmd BufRead *.bk set readonly
+
+" Jump to last edit position on opening file
+if has("autocmd")
+  " https://stackoverflow.com/questions/31449496/vim-ignore-specifc-file-in-autocommand
+  au BufReadPost * if expand('%:p') !~# '\m/\.git/' && line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
+endif
+
+" Help filetype detection
+autocmd BufRead *.plot set filetype=gnuplot
+autocmd BufRead *.md set filetype=markdown
+autocmd BufRead *.tex set filetype=tex
+autocmd BufRead *.rss set filetype=xml
 
 " -------------------------------------------------------------------------------
 " Platform
@@ -141,108 +244,306 @@ endif
 
 
 " ===============================================================================
-" Vundle Configuration
+" Plug Configuration
 " ===============================================================================
 
-set nocompatible               " be iMproved, required
-filetype off                   " required!
+call plug#begin()
+" The default plugin directory will be as follows:
+"   - Vim (Linux/macOS): '~/.vim/plugged'
+"   - Vim (Windows): '~/vimfiles/plugged'
+"   - Neovim (Linux/macOS/Windows): stdpath('data') . '/plugged'
+" You can specify a custom plugin directory by passing it as the argument
+"   - e.g. `call plug#begin('~/.vim/plugged')`
+"   - Avoid using standard Vim directory names like 'plugin'
 
-" set the runtime path to include Vundle and initialize
-set rtp+=~/.vim/bundle/Vundle.vim
-call vundle#begin()
-" alternatively, pass a path where Vundle should install plugins
-"call vundle#begin('~/some/path/here')
-
-" let Vundle manage Vundle, required!
-Plugin 'gmarik/Vundle.vim'
-
-" My Vundles here:
+" Make sure you use single quotes
 
 " Display
 "Plugin 'Lokaltog/vim-powerline'  " newer powerline is https://github.com/powerline/powerline
-Plugin 'vim-airline/vim-airline'
-Plugin 'vim-airline/vim-airline-themes'
-Plugin 'chriskempson/tomorrow-theme'
-Plugin 'kien/rainbow_parentheses.vim'
-"Plugin 'Yggdroot/indentLine'
+" Plug 'vim-airline/vim-airline'
+Plug 'itchyny/lightline.vim'          " Better Status Bar
+Plug 'mhinz/vim-startify'             " Better start screen
+Plug 'kien/rainbow_parentheses.vim'
+Plug 'Yggdroot/indentLine'
 " Note vim-colorschemes will cause vim-powerline not work if :tabnew
 " Plugin 'flazz/vim-colorschemes'  " themes collection
-Plugin 'Color-Scheme-Explorer'
+
+" Color Scheme
+" Plug 'chriskempson/tomorrow-theme'
+Plug 'morhetz/gruvbox'
+
+" Search
+Plug 'romainl/vim-cool'               " Disables highlight when search is done
+Plug 'haya14busa/incsearch.vim'       " Better incremental search
+Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }  " FZF plugin, makes Ctrl-P unnecessary
+Plug 'junegunn/fzf.vim'
+
+" Movement
+Plug 'justinmk/vim-sneak'
+Plug 'easymotion/vim-easymotion'
+Plug 'haya14busa/incsearch-easymotion.vim'
+Plug 'wikitopian/hardmode'            " Disable arrow keys and similar
+
+
+" Text edit
+" -------------------------------------------------------------------------------------
+Plug 'tpope/vim-sensible'             " Some better defaults
+Plug 'tpope/vim-unimpaired'           " Pairs of mappings
+Plug 'tpope/vim-surround'             " Surround with parentheses & co
+Plug 'joom/vim-commentary'            " To comment stuff out
+" Plug 'terryma/vim-multiple-cursors'   " Multiple cursors like sublime
+Plug 'godlygeek/tabular'              " For alignment
+Plug 'junegunn/vim-easy-align'        " Easier alignment
+Plug 'foosoft/vim-argwrap'            " convert lists of arguments into blocks of arguments
+" Interacts with coc Plug 'tpope/vim-endwise'              " Ends control flow indentifiers
+Plug 'tpope/vim-repeat'               " Adds repeat thorugh . to other packages
+" Plug 'tpope/vim-speeddating'          " Dates in vim
+
 
 " Linter
-Plugin 'w0rp/ale'
+" ------------------------------------------------------------------------------
+Plug 'w0rp/ale'
+Plug 'maximbaz/lightline-ale'          " Lightline + Ale
+Plug 'davidhalter/jedi-vim'
 
-" Python
-Plugin 'davidhalter/jedi-vim'
-Plugin 'nvie/vim-flake8'
-
+" python
+Plug 'nvie/vim-flake8'
 if g:distro != 'Gentoo'
     " under gentoo, conflict with dev-python/jinja builtin vim-jinja extension
-    Plugin 'mitsuhiko/vim-jinja'
+    Plug 'mitsuhiko/vim-jinja'
 endif
 "Plugin 'kevinw/pyflakes-vim'
 "Plugin 'fs111/pydoc.vim'
 "Plugin 'Pydiction'
 "Plugin 'pep8'
 
-" HTML & CSS
-Plugin 'mattn/emmet-vim'
-Plugin 'hail2u/vim-css3-syntax'
+"json
+Plug 'elzr/vim-json'
 
-" JavaScript
-Plugin 'pangloss/vim-javascript'  " improved indentation
-Plugin 'ternjs/tern_for_vim'  " js autocompletion
-Plugin 'Shutnik/jshint2.vim'
+"css/html
+Plug 'mattn/emmet-vim'
+Plug 'hail2u/vim-css3-syntax'
+Plug 'ap/vim-css-color'
 
-" Go
-Plugin 'fatih/vim-go'
+Plug 'pangloss/vim-javascript'  " improved indentation
+Plug 'ternjs/tern_for_vim'  " js autocompletion
+Plug 'Shutnik/jshint2.vim'
 
-" Markdown
-Plugin 'sjl/badwolf'
-Plugin 'plasticboy/vim-markdown'
+" go
+Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
+
+"markdown/latex
+Plug 'sjl/badwolf'
+Plug 'plasticboy/vim-markdown'
+Plug 'lervag/vimtex'
+
+" Autocomplete
+Plug 'neoclide/coc.nvim', {'branch': 'release'}
+
+
+" other
+Plug 'pprovost/vim-ps1'
+Plug 'liuchengxu/vista.vim'
+
+" Git
+" ------------------------------------------------------------------------------
+Plug 'airblade/vim-gitgutter'
+Plug 'tpope/vim-fugitive'
+Plug 'junegunn/gv.vim'                " TIG like navigation for vim
+Plug 'xuyuanp/nerdtree-git-plugin'    " Show status of files in NerdTree
+Plug 'tveskag/nvim-blame-line'        " Add git blame on line
 
 " Enhanced
-Plugin 'scrooloose/nerdtree'
-Plugin 'jistr/vim-nerdtree-tabs'
-Plugin 'airblade/vim-gitgutter'
-Plugin 'ervandew/supertab'
-Plugin 'SirVer/ultisnips'
-Plugin 'honza/vim-snippets'  " needed with SirVer/ultisnips
-Plugin 'AndrewRadev/splitjoin.vim'  " transition between multiline and single-line code
-Plugin 'Tagbar'  " Tagbar is more powerful than 'taglist.vim'
-Plugin 'Auto-Pairs'  " Auto-Pairs is more useful than AutoClose
-Plugin 'godlygeek/tabular'  " need by plasticboy/vim-markdown
-Plugin 'hotoo/pangu.vim'
-Plugin 'easymotion/vim-easymotion'
-" https://github.com/dyng/ctrlsf.vim
-Plugin 'dyng/ctrlsf.vim'
+" ------------------------------------------------------------------------------
+Plug 'scrooloose/nerdtree'
+Plug 'jistr/vim-nerdtree-tabs'
+" Plug 'ervandew/supertab'
+" Plug 'SirVer/ultisnips'
+" Plug 'honza/vim-snippets'  " needed with SirVer/ultisnips
+" Plug 'AndrewRadev/splitjoin.vim'  " transition between multiline and single-line code
+Plug 'majutsushi/tagbar'
+" Plug 'jiangmiao/auto-pairs'
+" Plug 'hotoo/pangu.vim'
+Plug 'simnalamburt/vim-mundo'
+Plug 'machakann/vim-highlightedyank'  " Highlight yanks
+Plug 'ojroques/vim-oscyank'           " Yank from remote sessions
+Plug 'andymass/vim-matchup'           " Highlight corresponding blocks e.g. if - fi in bash
+Plug 'kshenoy/vim-signature'          " Show marks in the gutter
+Plug 'yggdroot/indentline'            " Shows indentation levels
+Plug 'tpope/vim-eunuch'               " Unix helpers
+Plug 'moll/vim-bbye'                  " optional dependency for vim-symlink
+Plug 'aymericbeaumet/vim-symlink'     " Resolve symlinks before editing, plays nicely with undodir
 
+" https://github.com/dyng/ctrlsf.vim
+Plug 'dyng/ctrlsf.vim'
 
 if has('mac') || has('macunix')
-    Plugin 'rizzatti/dash.vim'
+    Plug 'rizzatti/dash.vim'
 endif
 
-call vundle#end()             " required!
-filetype plugin indent on     " required!
-" To ignore plugin indent changes, instead use:
-"filetype plugin on"
-"
-" Brief help
-" :PluginList       - lists configured plugins
-" :PluginInstall    - installs plugins; append `!` to update or just :PluginUpdate
-" :PluginSearch foo - searches for foo; append `!` to refresh local cache
-" :PluginClean      - confirms removal of unused plugins; append `!` to auto-approve removal
-"
-" see :h vundle for more details or wiki for FAQ
-" Put your non-Plugin stuff after this line
+" Initialize plugin system
+" - Automatically executes `filetype plugin indent on` and `syntax enable`.
+call plug#end()
+" You can revert the settings after the call like so:
+"   filetype indent off   " Disable file-type-specific indentation
+"   syntax off            " Disable syntax highlighting
 
+if isdirectory($HOME . "/.vim/plugged/coc.nvim")
+    call coc#add_extension(
+       \'coc-explorer',
+       \'coc-git',
+       \'coc-go',
+       \'coc-pyright',
+       \'coc-json',
+       \'coc-lua',
+       \'coc-prettier',
+       \'coc-rls',
+       \'coc-sh',
+       \'coc-tabnine',
+       \'coc-vimlsp',
+       \'coc-yaml',
+       \'coc-eslint',
+       \'coc-tsserver',
+       \'coc-xml',
+       \'coc-css',
+       \'coc-stylelint',
+     \)
+endif
+
+
+
+" Enables and Disables
+let g:gitgutter_enabled = 0          " vim-gitgutter
+let g:indentLine_enabled = 0         " indentline
+let g:SignatureEnabledAtStartup = 0  " vim-signature
+let g:startify_custom_header =[]     " Disable startify header
+
+" Coc
 " -------------------------------------------------------------------------------
+if !exists("*VSCodeNotify") && isdirectory($HOME . "/.vim/plugged/coc.nvim")
+
+    let g:coc_custom_config = '1'
+    let g:coc_node_path = $HOME . '/.nvm/versions/node/v16.18.0/bin/node'
+    " let g:coc_disable_startup_warning = 1
+
+    let g:vista_default_executive = 'coc'
+
+    source ~/.vim/coc.vim
+    " Use autocmd to force lightline update.
+    autocmd User CocStatusChange,CocDiagnosticChange call lightline#update()
+
+    " Lightline mods for CoC compatibility
+    let g:lightline = {
+          \ 'active': {
+          \   'left': [ [ 'mode', 'paste' ],
+          \             [ 'cocstatus', 'currentfunction', 'readonly', 'filename', 'modified', 'fugitive' ] ],
+          \   'right': [ [ 'lineinfo' ],
+		  \             [ 'percent' ],
+		  \              [ 'linter_checking', 'linter_errors', 'linter_warnings', 'linter_infos', 'linter_ok', 'filetype', 'fileencoding'] ]
+          \ },
+          \ 'component_function': {
+          \   'filename': 'LightlineFilename',
+          \   'cocstatus': 'coc#status',
+          \   'currentfunction': 'CocCurrentFunction'
+          \ },
+          \ }
+    function! LightlineFilename()
+      return expand('%:t') !=# '' ? @% : '[No Name]'
+    endfunction
+
+    function! CocCurrentFunction()
+        return get(b:, 'coc_current_function', '')
+    endfunction
+
+
+let g:lightline.component_expand = {
+      \  'linter_checking': 'lightline#ale#checking',
+      \  'linter_infos': 'lightline#ale#infos',
+      \  'linter_warnings': 'lightline#ale#warnings',
+      \  'linter_errors': 'lightline#ale#errors',
+      \  'linter_ok': 'lightline#ale#ok',
+      \ }
+
+let g:lightline.component_expand = {
+      \  'linter_checking': 'lightline#ale#checking',
+      \  'linter_infos': 'lightline#ale#infos',
+      \  'linter_warnings': 'lightline#ale#warnings',
+      \  'linter_errors': 'lightline#ale#errors',
+      \  'linter_ok': 'lightline#ale#ok',
+      \ }
+
+    " vim-easymotion disturbs diagnostics
+    " See https://github.com/neoclide/coc.nvim/issues/110
+    " let g:easymotion#is_active = 0
+    " function! EasyMotionCoc() abort
+    "   if EasyMotion#is_active()
+    "     let g:easymotion#is_active = 1
+    "     CocDisable
+    "   else
+    "     if g:easymotion#is_active == 1
+    "       let g:easymotion#is_active = 0
+    "       CocEnable
+    "     endif
+    "   endif
+    " endfunction
+    " autocmd TextChanged,CursorMoved * call EasyMotionCoc()
+
+   nnoremap <silent> <space>Y  :<C-u>CocList -A --normal yank<cr>
+
+   command! -nargs=0 Prettier :call CocAction('runCommand', 'prettier.formatFile')
+
+endif
+
+if exists('g:coc_custom_config')
+    " Symbol renaming.
+    nmap <leader>rn <Plug>(coc-rename)
+
+    nmap <Leader>! :<C-u>CocList diagnostics<CR>
+
+    " TODO figure out
+    " Formatting selected code.
+    " xmap <leader>F  <Plug>(coc-format-selected)
+    " nmap <leader>F  <Plug>(coc-format-selected)
+    " Applying codeAction to the selected region.
+    " Example: `<leader>aap` for current paragraph
+    " xmap <leader>a  <Plug>(coc-codeaction-selected)
+    " nmap <leader>a  <Plug>(coc-codeaction-selected)
+
+    " Remap keys for applying codeAction to the current buffer.
+    " nmap <leader>ac  <Plug>(coc-codeaction)
+    " Apply AutoFix to problem on the current line.
+    " nmap <leader>af  <Plug>(coc-fix-current)
+
+    """"""""""""" Coc-Git
+    " Undo git chunk (closest to linewise undo)
+    nmap <Leader>U :CocCommand git.chunkUndo<CR>
+    " Toggle GitGutter
+    nmap <Leader>og :CocCommand git.toggleGutters<CR>
+    " " navigate chunks of current buffer
+    nmap [c <Plug>(coc-git-prevchunk)
+    nmap ]c <Plug>(coc-git-nextchunk)
+    " show chunk diff at current position
+    nmap gs <Plug>(coc-git-chunkinfo)
+    " show commit contains current position
+    nmap gc <Plug>(coc-git-commit)
+    " " create text object for git chunks
+    omap ig <Plug>(coc-git-chunk-inner)
+    xmap ig <Plug>(coc-git-chunk-inner)
+    omap ag <Plug>(coc-git-chunk-outer)
+    xmap ag <Plug>(coc-git-chunk-outer)
+
+    " Play nicely with EasyMotion
+    autocmd User EasyMotionPromptBegin silent! CocDisable
+    autocmd User EasyMotionPromptEnd silent! CocEnable
+endif
+
+
 " Lokaltog/vim-powerline
 " -------------------------------------------------------------------------------
-let g:Powerline_symbols = 'unicode' " compatible/unicode/fancy
-set laststatus=2   " Always show the statusline
-set encoding=utf-8 " Necessary to show Unicode glyphs
-set t_Co=256 " Explicitly tell Vim that the terminal supports 256 colors
+" let g:Powerline_symbols = 'unicode' " compatible/unicode/fancy
+" set laststatus=2   " Always show the statusline
+" set encoding=utf-8 " Necessary to show Unicode glyphs
+" set t_Co=256 " Explicitly tell Vim that the terminal supports 256 colors
 
 
 " -------------------------------------------------------------------------------
@@ -251,18 +552,29 @@ set t_Co=256 " Explicitly tell Vim that the terminal supports 256 colors
 " Keep vim-powerline configuration opened
 " In Mac with iTerm2, need to select patched font for non-ascii font, in
 " Profiles -> Text
-let g:airline_powerline_fonts = 1
-let g:airline_theme='tomorrow'
+" let g:airline_powerline_fonts = 1
+" let g:airline_theme='simple'
 
+
+"-------------------------------------------------------------------------------
+" Lightline
+"-------------------------------------------------------------------------------
+set noshowmode  "unnecessary when lighline enabled"
+
+"-------------------------------------------------------------------------------
+" fzf
+"-------------------------------------------------------------------------------
+set rtp+=/usr/local/opt/fzf
+let g:fzf_layout = { 'down': '~20%' }
 
 " -------------------------------------------------------------------------------
 " kien/rainbow_parentheses.vim
 " -------------------------------------------------------------------------------
 " always on
-au VimEnter *.py,*.js,*.html,*.css,*.sls RainbowParenthesesToggle
-au Syntax *.py,*.js,*.html,*.css,*.sls RainbowParenthesesLoadRound
-au Syntax *.py,*.js,*.html,*.css,*.sls RainbowParenthesesLoadSquare
-au Syntax *.py,*.js,*.html,*.css,*.sls RainbowParenthesesLoadBraces
+au VimEnter *.py,*.js,*.html,*.css,*.sls,*.c, *.cpp RainbowParenthesesToggle
+au Syntax *.py,*.js,*.html,*.css,*.sls, *.c, *.cpp RainbowParenthesesLoadRound
+au Syntax *.py,*.js,*.html,*.css,*.sls, *.c, *.cpp RainbowParenthesesLoadSquare
+au Syntax *.py,*.js,*.html,*.css,*.sls, *.c, *.cpp RainbowParenthesesLoadBraces
 
 " the outer layer is the last pair
 " remove black for dark terminal
@@ -289,20 +601,32 @@ let g:rbpt_max = 15
 " Yggdroot/indentLine
 " -------------------------------------------------------------------------------
 "   https://github.com/Yggdroot/indentLine
-" let g:indentLine_char='┆'
-" let g:indentLine_enabled = 1
+let g:indentLine_char='┆'
+let g:indentLine_enabled = 0
 
 " -------------------------------------------------------------------------------
 " w0rp/ale
 " -------------------------------------------------------------------------------
-let b:ale_linters = ['flake8']
+let g:ale_enabled = 1
+let g:ale_lint_on_enter = 0
+let g:ale_lint_on_save = 1
 let g:ale_lint_on_text_changed = 'never'
-let g:airline#extensions#ale#enabled = 1
+let g:ale_fix_on_save = 1
 let g:ale_echo_msg_error_str = 'E'
 let g:ale_echo_msg_warning_str = 'W'
 let g:ale_echo_msg_format = '[%linter%] %s [%code%]'
-nmap <silent> <C-k> <Plug>(ale_previous_wrap)
-nmap <silent> <C-j> <Plug>(ale_next_wrap)
+nmap <silent> [a <Plug>(ale_previous_wrap)
+nmap <silent> ]a <Plug>(ale_next_wrap)
+
+let g:ale_fixers = {
+    \   '*': ['remove_trailing_lines', 'trim_whitespace'],
+    \   'javascript': ['prettier'],
+    \   'css': ['prettier'],
+    \   'html': ['prettier'],
+    \   'markdown': ['prettier'],
+    \   'json': ['prettier'],
+    \   'yaml': ['prettier'],
+    \}
 
 " -------------------------------------------------------------------------------
 " davidhalter/jedi-vim
@@ -353,13 +677,15 @@ augroup END
 
 " ----------------------------------------------------------------------------
 " ternjs/tern_for_vim
-" ----------------------------------------------------------------------------
-let tern_show_signature_in_pum = 1
-let tern_show_argument_hints = 'on_hold'
-autocmd FileType javascript nnoremap <leader>d :TernDef<CR>
-autocmd FileType javascript setlocal omnifunc=tern#Complete
-"
-" ----------------------------------------------------------------------------
+" " ----------------------------------------------------------------------------
+" let tern_show_signature_in_pum = 1
+" let tern_show_argument_hints = 'on_hold'
+" autocmd FileType javascript nnoremap <leader>d :TernDef<CR>
+" autocmd FileType javascript setlocal omnifunc=tern#Complete
+
+
+
+"----------------------------------------------------------------------------
 " Shutnik/jshint2.vim
 " ----------------------------------------------------------------------------
 let jshint2_save = 1
@@ -385,54 +711,35 @@ autocmd vimEnter *.go NERDTree
 " ----------------------------------------------------------------------------
 " ervandew/supertab
 " ----------------------------------------------------------------------------
-set completeopt=longest,menu,preview
-let g:SuperTabDefaultCompletionType = "<c-x><c-o>"  " use omni completion instead of default
-let g:SuperTabCrMapping = 1  " disable <enter> with newline, https://github.com/ervandew/supertab/issues/142
+" set completeopt=longest,menu,preview
+" let g:SuperTabDefaultCompletionType = "<c-x><c-o>"  " use omni completion instead of default
+" let g:SuperTabCrMapping = 1  " disable <enter> with newline, https://github.com/ervandew/supertab/issues/142
 
-" Define keyword.
-if !exists('g:neocomplete#keyword_patterns')
-    let g:neocomplete#keyword_patterns = {}
-endif
-let g:neocomplete#keyword_patterns['default'] = '\h\w*'
-
-" Plugin key-mappings.
-inoremap <expr><C-g>     neocomplete#undo_completion()
-inoremap <expr><C-l>     neocomplete#complete_common_string()
 
 " Recommended key-mappings.
 " <TAB>: completion.
-inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
-" <C-h>, <BS>: close popup and delete backword char.
-inoremap <expr><C-h> neocomplete#smart_close_popup()."\<C-h>"
-inoremap <expr><BS> neocomplete#smart_close_popup()."\<C-h>"
+" inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
 " Close popup by <Space>.
-"inoremap <expr><Space> pumvisible() ? "\<C-y>" : "\<Space>"
+" inoremap <expr><Space> pumvisible() ? "\<C-y>" : "\<Space>"
 
-" AutoComplPop like behavior.
-let g:neocomplete#enable_auto_select = 1
 
 " Enable omni completion.
-autocmd FileType css setlocal omnifunc=csscomplete#CompleteCSS
-autocmd FileType html,markdown setlocal omnifunc=htmlcomplete#CompleteTags
-autocmd FileType javascript setlocal omnifunc=tern#Complete  " for ternjs
-autocmd FileType python setlocal omnifunc=jedi#completions  " for jedi
-autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
-
-" Enable heavy omni completion.
-if !exists('g:neocomplete#sources#omni#input_patterns')
-  let g:neocomplete#sources#omni#input_patterns = {}
-endif
+" autocmd FileType css setlocal omnifunc=csscomplete#CompleteCSS
+" autocmd FileType html,markdown setlocal omnifunc=htmlcomplete#CompleteTags
+" autocmd FileType javascript setlocal omnifunc=tern#Complete  " for ternjs
+" autocmd FileType python setlocal omnifunc=jedi#completions  " for jedi
+" autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
 
 " ----------------------------------------------------------------------------
 " SirVer/ultisnips
 " ----------------------------------------------------------------------------
 " Trigger configuration. Do not use <tab> if you use https://github.com/Valloric/YouCompleteMe.
-let g:UltiSnipsExpandTrigger="<tab>"
-let g:UltiSnipsJumpForwardTrigger="<c-b>"
-let g:UltiSnipsJumpBackwardTrigger="<c-z>"
+" let g:UltiSnipsExpandTrigger="<tab>"
+" let g:UltiSnipsJumpForwardTrigger="<c-b>"
+" let g:UltiSnipsJumpBackwardTrigger="<c-z>"
 
 " If you want :UltiSnipsEdit to split your window.
-let g:UltiSnipsEditSplit="vertical"
+" let g:UltiSnipsEditSplit="vertical"
 
 " ----------------------------------------------------------------------------
 " Tagbar
@@ -462,6 +769,10 @@ let g:tagbar_sort = 0
 let g:gitgutter_max_signs = 500
 "let g:gitgutter_highlight_lines = 1
 highlight clear SignColumn
+nmap ghs <Plug>(GitGutterStageHunk)
+nmap ghu <Plug>(GitGutterUndoHunk)
+nmap ghp <Plug>(GitGutterPreviewHunk)
+
 
 " ----------------------------------------------------------------------------
 " SirVer/ultisnips
@@ -510,6 +821,42 @@ nmap <Leader>L <Plug>(easymotion-overwin-line)
 map  <Leader>w <Plug>(easymotion-bd-w)
 nmap <Leader>w <Plug>(easymotion-overwin-w)
 
+" <Leader> hjkl
+map <Leader>h <Plug>(easymotion-linebackward)
+map <Leader>j <Plug>(easymotion-j)
+map <Leader>k <Plug>(easymotion-k)
+map <Leader>l <Plug>(easymotion-lineforward)
+
+
+
+" Use uppercase target labels and type as a lower case
+let g:EasyMotion_use_upper = 1
+let g:EasyMotion_keys = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ;'
+" Turn on case-insensitive feature
+let g:EasyMotion_smartcase = 1
+map <Leader> <Plug>(easymotion-prefix)
+
+" incsearch
+map / <Plug>(incsearch-forward)
+map ? <Plug>(incsearch-backward)
+map g/ <Plug>(incsearch-stay)
+
+" incsearch-easymotion
+map z/ <Plug>(incsearch-easymotion-/)
+map z? <Plug>(incsearch-easymotion-?)
+map zg/ <Plug>(incsearch-easymotion-stay)
+
+" vim-sneak behaviour through easymotio
+map <Leader>t <Plug>(easymotion-t2)
+nmap <Leader>t <Plug>(easymotion-overwin-t2)
+map <Leader>s <Plug>(easymotion-f2)
+nmap <Leader>s <Plug>(easymotion-overwin-f2)
+
+map <Leader>/ <Plug>(incsearch-easymotion-/)
+map <Leader>? <Plug>(incsearch-easymotion-?)
+map <Leader>g/ <Plug>(incsearch-easymotion-stay)
+
+
 " ----------------------------------------------------------------------------
 " dyng/ctrlsf.vim
 " https://github.com/dyng/ctrlsf.vim
@@ -525,6 +872,72 @@ inoremap <C-F>t <Esc>:CtrlSFToggle<CR>
 let g:ctrlsf_search_mode = 'async'  " vim >= 8.0
 " let g:ctrlsf_winsize = '40%'
 
+"--------------------------------------------------------------------------------------------
+" vim-easy-align
+" -------------------------------------------------------------------------------------------
+" Start interactive EasyAlign in visual mode (e.g. vipga)
+xmap ga <Plug>(EasyAlign)
+
+" Start interactive EasyAlign for a motion/text object (e.g. gaip)
+nmap ga <Plug>(EasyAlign)
+
+"-------------------------------------------------------------------------------------------
+" argwrap
+"-------------------------------------------------------------------------------------------
+" aw    -- ArgWrap
+nnoremap <Leader>aw :ArgWrap<CR>
+
+autocmd TextYankPost * if v:event.operator is 'y' && v:event.regname is '+' | execute 'OSCYankReg +' | endif
+
+
+"===============================================================================
+" Custom Function
+"===============================================================================
+"
+function! ToggleALEFix()
+    if(g:ale_fix_on_save == 1)
+        let g:ale_fix_on_save = 0
+    else
+        let g:ale_fix_on_save = 1
+    endif
+endfunc
+
+function! ToggleLineNumber()
+    if(&relativenumber == 1)
+        set norelativenumber
+        set number
+    else
+        set relativenumber
+    endif
+endfunc
+
+function! ToggleColorColumn()
+    if &colorcolumn == ""
+        set colorcolumn=88
+    else
+        set colorcolumn=
+    endif
+endfunction
+
+function! ToggleZoom(toggle)
+  if exists("t:restore_zoom") && (t:restore_zoom.win != winnr() || a:toggle == v:true)
+      exec t:restore_zoom.cmd
+      unlet t:restore_zoom
+  elseif a:toggle
+      let t:restore_zoom = { 'win': winnr(), 'cmd': winrestcmd() }
+      vert resize | resize
+  endif
+endfunction
+augroup restorezoom
+    au WinEnter * silent! :call ToggleZoom(v:false)
+augroup END
+
+
+command! LineNumberToggle call ToggleLineNumber()
+command! ALEfixToggle call ToggleALEFix()
+command! ColorColumnToggle call ToggleColorColumn()
+
+
 
 " ===============================================================================
 " Color Settings
@@ -535,7 +948,7 @@ set t_Co=256
 
 if exists('+colorcolumn')
     " cc is only exist >= `Vim7.3`
-    set cc=81 " Short for colorcolumn
+    set cc=90 " Short for colorcolumn
 else
     au BufWinEnter * let w:m2=matchadd('ErrorMsg', '\%>80v.\+', -1)
 endif
@@ -543,7 +956,7 @@ hi ColorColumn ctermbg=lightgrey guibg=lightgrey  " Highlighter cc
 
 try
     set background=dark
-    colorscheme Tomorrow-Night
+    colorscheme gruvbox
     " Below syntax will affect vim-airline statusbar; write colorscheme
     " directly is ok
     " autocmd BufEnter * colorscheme Tomorrow-Night-Bright
