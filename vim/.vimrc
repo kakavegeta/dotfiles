@@ -40,11 +40,10 @@ set tabstop=4
 set softtabstop=4
 set shiftwidth=4
 set smarttab
-"set expandtab  " Use the space to instead of tab
+set expandtab  " Use the space to instead of tab
 set autoindent  " Copy indent from current line when starting a new line
 set smartindent
 set cindent
-
 
 " Seach and Match
 """""""""""""""""""""""""""""""""""""""""
@@ -58,7 +57,7 @@ vnoremap <C-h> :nohlsearch<cr>
 nnoremap <C-h> :nohlsearch<cr>
 " <C-l>: quick temp disable hlsearch
 nnoremap <silent> <C-l> :<C-u>nohlsearch<CR><C-l>
-
+set wildignore+=*/.git/*,*/tmp/*,*.swp
 
 
 " Undo
@@ -66,6 +65,28 @@ nnoremap <silent> <C-l> :<C-u>nohlsearch<CR><C-l>
 set undofile
 set undodir=~/.vim/undodir
 
+" Folding
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+set foldenable          " enable folding
+set foldlevelstart=10   " open most folds by default
+set foldnestmax=10      " 10 nested fold max
+" space open/closes folds
+" nnoremap <space> za
+set foldmethod=indent   " fold based on indent level
+" This is especially useful for me since I spend my days in Python.
+" Other acceptable values are marker, manual, expr, syntax, diff.
+" Run :help foldmethod to find out what each of those do.
+" " Folding
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+set foldenable          " enable folding
+set foldlevelstart=10   " open most folds by default
+set foldnestmax=10      " 10 nested fold max
+" space open/closes folds
+" nnoremap <space> za
+set foldmethod=indent   " fold based on indent level
+" This is especially useful for me since I spend my days in Python.
+" Other acceptable values are marker, manual, expr, syntax, diff.
+" Run :help foldmethod to find out what each of those do.
 
 " Movement
 """""""""""""""""""""""""
@@ -142,14 +163,16 @@ endf
 autocmd bufnewfile *.sh call HeaderBash()
 
 " ref: http://stackoverflow.com/questions/158968/changing-vim-indentation-behavior-by-file-type
-autocmd FileType html set shiftwidth=2|set expandtab
-autocmd FileType htmljinja setlocal shiftwidth=2 tabstop=2 softtabstop=2 expandtab
-autocmd FileType htmldjango setlocal shiftwidth=2 tabstop=2 softtabstop=2 expandtab
-autocmd FileType css setlocal shiftwidth=2 tabstop=2 softtabstop=2 expandtab
-autocmd Filetype javascript setlocal ts=2 sts=2 sw=2 expandtab
-autocmd FileType sh setlocal shiftwidth=4 tabstop=4 softtabstop=4 expandtab
-autocmd FileType python setlocal shiftwidth=4 tabstop=4 softtabstop=4 expandtab
-autocmd FileType vim setlocal shiftwidth=2 tabstop=2 softtabstop=2 expandtab
+" autocmd FileType html set shiftwidth=2|set expandtab
+" autocmd FileType htmljinja setlocal shiftwidth=2 tabstop=2 softtabstop=2 expandtab
+" autocmd FileType htmldjango setlocal shiftwidth=2 tabstop=2 softtabstop=2 expandtab
+" autocmd FileType css setlocal shiftwidth=2 tabstop=2 softtabstop=2 expandtab
+" autocmd Filetype javascript setlocal ts=2 sts=2 sw=2 expandtab
+" autocmd FileType sh setlocal shiftwidth=4 tabstop=4 softtabstop=4 expandtab
+" autocmd FileType python setlocal shiftwidth=4 tabstop=4 softtabstop=4 expandtab
+" autocmd FileType vim setlocal shiftwidth=2 tabstop=2 softtabstop=2 expandtab
+"
+
 
 " enable quick jump between keyword, such as if/endif
 runtime macros/matchit.vim
@@ -174,34 +197,6 @@ inoremap jk <Esc>
 " nmap <Leader>wq :wq<CR>
 " nmap <Leader>Q :q!<CR>
 
-" Quick copy/paste to system clipboard
-nmap <Leader>y "+y
-nmap <Leader>d "+d
-vmap <Leader>y "+y
-vmap <Leader>d "+d
-nmap <Leader>p "+p
-nmap <Leader>P "+P
-vmap <Leader>p "+p
-vmap <Leader>P "+P
-
-
-"  ;  --   FZF
-nmap <Leader>; :Buffers<CR>
-
-"  e g H -- FZF
-nnoremap <Leader>g :Rg<CR>
-nnoremap <Leader>e :Files<CR>
-nnoremap <Leader>H :History<CR>
-
-"  <Space>  --  <leader><leader> toggles between buffers
-nnoremap <Leader><Leader> <c-^>
-
-" toggles
-nnoremap <Leader>ob :ToggleBlameLine<CR>
-nnoremap <Leader>og :GitGutterToggle<CR>
-nnoremap <Leader>oa :ALEToggle<CR>
-nnoremap <Leader>oe :NERDTreeToggle<CR>
-nnoremap <Leader>of :ALEfixToggle<CR>
 
 " ------------------------------------------------------------------------------
 " # Autocommands
@@ -285,7 +280,7 @@ Plug 'haya14busa/incsearch-easymotion.vim'
 Plug 'wikitopian/hardmode'            " Disable arrow keys and similar
 
 
-" Text edit
+" Edit
 " -------------------------------------------------------------------------------------
 Plug 'tpope/vim-sensible'             " Some better defaults
 Plug 'tpope/vim-unimpaired'           " Pairs of mappings
@@ -298,7 +293,13 @@ Plug 'foosoft/vim-argwrap'            " convert lists of arguments into blocks o
 " Interacts with coc Plug 'tpope/vim-endwise'              " Ends control flow indentifiers
 Plug 'tpope/vim-repeat'               " Adds repeat thorugh . to other packages
 " Plug 'tpope/vim-speeddating'          " Dates in vim
+"
 
+"Writing
+Plug 'junegunn/goyo.vim'               " Distraction free mode
+Plug 'junegunn/limelight.vim'          " Focus on current paragraph
+Plug 'rhysd/vim-grammarous'            " GrammarCheck using LanguageTool
+Plug 'ron89/thesaurus_query.vim'       " Synonym query
 
 " Linter
 " ------------------------------------------------------------------------------
@@ -307,11 +308,11 @@ Plug 'maximbaz/lightline-ale'          " Lightline + Ale
 Plug 'davidhalter/jedi-vim'
 
 " python
-Plug 'nvie/vim-flake8'
-if g:distro != 'Gentoo'
-    " under gentoo, conflict with dev-python/jinja builtin vim-jinja extension
-    Plug 'mitsuhiko/vim-jinja'
-endif
+" Plug 'nvie/vim-flake8'
+" if g:distro != 'Gentoo'
+"     " under gentoo, conflict with dev-python/jinja builtin vim-jinja extension
+"     Plug 'mitsuhiko/vim-jinja'
+" endif
 "Plugin 'kevinw/pyflakes-vim'
 "Plugin 'fs111/pydoc.vim'
 "Plugin 'Pydiction'
@@ -344,6 +345,7 @@ Plug 'neoclide/coc.nvim', {'branch': 'release'}
 " other
 Plug 'pprovost/vim-ps1'
 Plug 'liuchengxu/vista.vim'
+Plug 'liuchengxu/vim-which-key'
 
 " Git
 " ------------------------------------------------------------------------------
@@ -356,7 +358,7 @@ Plug 'tveskag/nvim-blame-line'        " Add git blame on line
 " Enhanced
 " ------------------------------------------------------------------------------
 Plug 'scrooloose/nerdtree'
-Plug 'jistr/vim-nerdtree-tabs'
+" Plug 'jistr/vim-nerdtree-tabs'
 " Plug 'ervandew/supertab'
 " Plug 'SirVer/ultisnips'
 " Plug 'honza/vim-snippets'  " needed with SirVer/ultisnips
@@ -377,6 +379,7 @@ Plug 'aymericbeaumet/vim-symlink'     " Resolve symlinks before editing, plays n
 " https://github.com/dyng/ctrlsf.vim
 Plug 'dyng/ctrlsf.vim'
 
+
 if has('mac') || has('macunix')
     Plug 'rizzatti/dash.vim'
 endif
@@ -394,12 +397,13 @@ if isdirectory($HOME . "/.vim/plugged/coc.nvim")
        \'coc-git',
        \'coc-go',
        \'coc-pyright',
+       \'coc-clangd',
        \'coc-json',
        \'coc-lua',
        \'coc-prettier',
+       \'coc-highlight',
        \'coc-rls',
        \'coc-sh',
-       \'coc-tabnine',
        \'coc-vimlsp',
        \'coc-yaml',
        \'coc-eslint',
@@ -493,50 +497,6 @@ let g:lightline.component_expand = {
    command! -nargs=0 Prettier :call CocAction('runCommand', 'prettier.formatFile')
 
 endif
-
-if exists('g:coc_custom_config')
-    " Symbol renaming.
-    nmap <leader>rn <Plug>(coc-rename)
-
-    nmap <Leader>! :<C-u>CocList diagnostics<CR>
-
-    " TODO figure out
-    " Formatting selected code.
-    " xmap <leader>F  <Plug>(coc-format-selected)
-    " nmap <leader>F  <Plug>(coc-format-selected)
-    " Applying codeAction to the selected region.
-    " Example: `<leader>aap` for current paragraph
-    " xmap <leader>a  <Plug>(coc-codeaction-selected)
-    " nmap <leader>a  <Plug>(coc-codeaction-selected)
-
-    " Remap keys for applying codeAction to the current buffer.
-    " nmap <leader>ac  <Plug>(coc-codeaction)
-    " Apply AutoFix to problem on the current line.
-    " nmap <leader>af  <Plug>(coc-fix-current)
-
-    """"""""""""" Coc-Git
-    " Undo git chunk (closest to linewise undo)
-    nmap <Leader>U :CocCommand git.chunkUndo<CR>
-    " Toggle GitGutter
-    nmap <Leader>og :CocCommand git.toggleGutters<CR>
-    " " navigate chunks of current buffer
-    nmap [c <Plug>(coc-git-prevchunk)
-    nmap ]c <Plug>(coc-git-nextchunk)
-    " show chunk diff at current position
-    nmap gs <Plug>(coc-git-chunkinfo)
-    " show commit contains current position
-    nmap gc <Plug>(coc-git-commit)
-    " " create text object for git chunks
-    omap ig <Plug>(coc-git-chunk-inner)
-    xmap ig <Plug>(coc-git-chunk-inner)
-    omap ag <Plug>(coc-git-chunk-outer)
-    xmap ag <Plug>(coc-git-chunk-outer)
-
-    " Play nicely with EasyMotion
-    autocmd User EasyMotionPromptBegin silent! CocDisable
-    autocmd User EasyMotionPromptEnd silent! CocEnable
-endif
-
 
 " Lokaltog/vim-powerline
 " -------------------------------------------------------------------------------
@@ -643,15 +603,15 @@ let g:jedi#completions_command = "<C-N>"
 
 " -------------------------------------------------------------------------------
 " nvie/vim-flake8
-" -------------------------------------------------------------------------------
-autocmd FileType python map <buffer> <F3> :call Flake8()<CR>
-let g:flake8_quickfix_height=5
-let g:flake8_show_in_gutter=1
-highlight link Flake8_Error      Error
-highlight link Flake8_Warning    WarningMsg
-highlight link Flake8_Complexity WarningMsg
-highlight link Flake8_Naming     WarningMsg
-highlight link Flake8_PyFlake    WarningMsg
+" " -------------------------------------------------------------------------------
+" autocmd FileType python map <buffer> <F3> :call Flake8()<CR>
+" let g:flake8_quickfix_height=5
+" let g:flake8_show_in_gutter=1
+" highlight link Flake8_Error      Error
+" highlight link Flake8_Warning    WarningMsg
+" highlight link Flake8_Complexity WarningMsg
+" highlight link Flake8_Naming     WarningMsg
+" highlight link Flake8_PyFlake    WarningMsg
 "autocmd BufWritePost *.py call Flake8()
 
 " ----------------------------------------------------------------------------
@@ -705,8 +665,10 @@ let g:vim_markdown_toc_autofit = 1
 " scrooloose/nerdtree and jistr/vim-nerdtree-tabs
 " ----------------------------------------------------------------------------
 "nmap <leader>ne :NERDTreeToggle<CR>
-nmap <leader>ne :NERDTreeTabsToggle<CR>
-autocmd vimEnter *.go NERDTree
+" nmap <leader>ne :NERDTreeTabsToggle<CR>
+" autocmd vimEnter *.go NERDTree
+" Close vim if only window left is NERDTree
+autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
 
 " ----------------------------------------------------------------------------
 " ervandew/supertab
@@ -806,29 +768,6 @@ nmap <silent> <leader>da <Plug>DashSearch
 " easymotion/vim-easymotion
 " https://github.com/easymotion/vim-easymotion
 " ----------------------------------------------------------------------------
-" <Leader>f{char} to move to {char}
-map  <Leader>f <Plug>(easymotion-bd-f)
-nmap <Leader>f <Plug>(easymotion-overwin-f)
-
-" s{char}{char} to move to {char}{char}
-nmap s <Plug>(easymotion-overwin-f2)
-
-" Move to line
-map <Leader>L <Plug>(easymotion-bd-jk)
-nmap <Leader>L <Plug>(easymotion-overwin-line)
-
-" Move to word
-map  <Leader>w <Plug>(easymotion-bd-w)
-nmap <Leader>w <Plug>(easymotion-overwin-w)
-
-" <Leader> hjkl
-map <Leader>h <Plug>(easymotion-linebackward)
-map <Leader>j <Plug>(easymotion-j)
-map <Leader>k <Plug>(easymotion-k)
-map <Leader>l <Plug>(easymotion-lineforward)
-
-
-
 " Use uppercase target labels and type as a lower case
 let g:EasyMotion_use_upper = 1
 let g:EasyMotion_keys = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ;'
@@ -845,16 +784,6 @@ map g/ <Plug>(incsearch-stay)
 map z/ <Plug>(incsearch-easymotion-/)
 map z? <Plug>(incsearch-easymotion-?)
 map zg/ <Plug>(incsearch-easymotion-stay)
-
-" vim-sneak behaviour through easymotio
-map <Leader>t <Plug>(easymotion-t2)
-nmap <Leader>t <Plug>(easymotion-overwin-t2)
-map <Leader>s <Plug>(easymotion-f2)
-nmap <Leader>s <Plug>(easymotion-overwin-f2)
-
-map <Leader>/ <Plug>(incsearch-easymotion-/)
-map <Leader>? <Plug>(incsearch-easymotion-?)
-map <Leader>g/ <Plug>(incsearch-easymotion-stay)
 
 
 " ----------------------------------------------------------------------------
@@ -887,11 +816,36 @@ nmap ga <Plug>(EasyAlign)
 " aw    -- ArgWrap
 nnoremap <Leader>aw :ArgWrap<CR>
 
+"---------------------------------------------------------------------------------------
+" remote yanks
+"----------------------------------------------------------------------------------------
 autocmd TextYankPost * if v:event.operator is 'y' && v:event.regname is '+' | execute 'OSCYankReg +' | endif
 
+let g:secure_modelines_allowed_items = [
+                \ "textwidth",   "tw",
+                \ "softtabstop", "sts",
+                \ "tabstop",     "ts",
+                \ "shiftwidth",  "sw",
+                \ "expandtab",   "et",   "noexpandtab", "noet",
+                \ "filetype",    "ft",
+                \ "foldmethod",  "fdm",
+                \ "readonly",    "ro",   "noreadonly", "noro",
+                \ "rightleft",   "rl",   "norightleft", "norl",
+                \ "colorcolumn"
+                \ ]
+
+"---------------------------------------------------------------------------------------
+" vimtex
+"----------------------------------------------------------------------------------------
+let g:tex_flavor = "latex"
+
+" * Limelight
+let g:limelight_conceal_ctermfg = 'gray'
+"autocmd! User GoyoEnter Limelight
+"autocmd! User GoyoLeave Limelight!
 
 "===============================================================================
-" Custom Function
+" Custom Function & Key Binds
 "===============================================================================
 "
 function! ToggleALEFix()
@@ -936,6 +890,143 @@ augroup END
 command! LineNumberToggle call ToggleLineNumber()
 command! ALEfixToggle call ToggleALEFix()
 command! ColorColumnToggle call ToggleColorColumn()
+
+
+" Modifiers
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""
+nnoremap <C-g> :Goyo<CR>
+map <C-p> :Files<CR>
+map <C-h> :History<CR>
+
+
+" <Nothing> -- vim-which-key
+nnoremap <silent> <leader> :WhichKey '<Space>'<CR>
+
+"  ;  --   FZF
+nmap <Leader>; :Buffers<CR>
+
+"  <Space>  --  <leader><leader> toggles between buffers
+nnoremap <Leader><Leader> <c-^>
+
+"  - |     --  Split with leader
+nnoremap <Leader>- :sp<CR>
+nnoremap <Leader>\| :vsp<CR>
+
+"  e g H -- FZF
+nnoremap <Leader>g :Rg<CR>
+nnoremap <Leader>e :Files<CR>
+nnoremap <Leader>H :History<CR>
+
+" Quick copy/paste to system clipboard
+nmap <Leader>y "+y
+nmap <Leader>d "+d
+vmap <Leader>y "+y
+vmap <Leader>d "+d
+nmap <Leader>p "+p
+nmap <Leader>P "+P
+vmap <Leader>p "+p
+vmap <Leader>P "+P
+
+" toggles
+nnoremap <Leader>oa :ALEToggle<CR>
+nnoremap <Leader>ob :ToggleBlameLine<CR>
+nnoremap <Leader>oc :ColorToggle<CR>
+nnoremap <Leader>oe :NERDTreeToggle<CR>
+nnoremap <Leader>of :ALEfixToggle<CR>
+nnoremap <Leader>og :GitGutterToggle<CR>
+nnoremap <Leader>ol :ColorColumnToggle<CR>
+nnoremap <Leader>om :SignatureToggle<CR>
+nnoremap <Leader>on :LineNumberToggle<CR>
+nnoremap <Leader>op :RainbowToggle<CR>
+nnoremap <Leader>ot :Vista!!<CR>
+nnoremap <Leader>os :setlocal spell! spelllang=en_us<CR>
+nnoremap <Leader>u :MundoToggle<CR>
+
+"  z   -- Toggle Pane Zoom
+nnoremap <silent> <Leader>+ :call ToggleZoom(v:true)<CR>
+
+" `  `v  `z  rv  -- edit vimrc/zshrc and load vimrc bindings
+nnoremap <Leader>` :Startify<CR>
+nnoremap <Leader>`z :vsp ~/.zshrc<CR>
+nnoremap <Leader>`v :vsp ~/.vimrc<CR>
+nnoremap <Leader>rv :source ~/.vimrc<CR>
+
+" hjkl  s j k t / ? g/   -- EasyMotion
+map <Leader>h <Plug>(easymotion-linebackward)
+map <Leader>j <Plug>(easymotion-j)
+map <Leader>k <Plug>(easymotion-k)
+map <Leader>l <Plug>(easymotion-lineforward)
+
+" <Leader>f{char} to move to {char}
+map  <Leader>f <Plug>(easymotion-bd-f)
+nmap <Leader>f <Plug>(easymotion-overwin-f)
+" vim-sneak behaviour through easymotio
+map <Leader>t <Plug>(easymotion-t2)
+nmap <Leader>t <Plug>(easymotion-overwin-t2)
+map <Leader>s <Plug>(easymotion-f2)
+nmap <Leader>s <Plug>(easymotion-overwin-f2)
+
+map <Leader>/ <Plug>(incsearch-easymotion-/)
+map <Leader>? <Plug>(incsearch-easymotion-?)
+map <Leader>g/ <Plug>(incsearch-easymotion-stay)
+
+" numbers
+nnoremap <Leader>1 1gt<CR>
+nnoremap <Leader>2 2gt<CR>
+nnoremap <Leader>3 3gt<CR>
+nnoremap <Leader>4 4gt<CR>
+nnoremap <Leader>5 5gt<CR>
+nnoremap <Leader>6 6gt<CR>
+nnoremap <Leader>7 7gt<CR>
+nnoremap <Leader>8 8gt<CR>
+nnoremap <Leader>9 9gt<CR>
+nnoremap <Leader>n :tabnew<CR>
+nnoremap <Leader>x :tabclose<CR>
+
+" rn F a ac af U -- Conquer of Completion
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""
+if exists('g:coc_custom_config')
+    " Symbol renaming.
+    nmap <leader>rn <Plug>(coc-rename)
+
+    nmap <Leader>! :<C-u>CocList diagnostics<CR>
+
+    " TODO figure out
+    " Formatting selected code.
+    " xmap <leader>F  <Plug>(coc-format-selected)
+    " nmap <leader>F  <Plug>(coc-format-selected)
+    " Applying codeAction to the selected region.
+    " Example: `<leader>aap` for current paragraph
+    " xmap <leader>a  <Plug>(coc-codeaction-selected)
+    " nmap <leader>a  <Plug>(coc-codeaction-selected)
+
+    " Remap keys for applying codeAction to the current buffer.
+    " nmap <leader>ac  <Plug>(coc-codeaction)
+    " Apply AutoFix to problem on the current line.
+    " nmap <leader>af  <Plug>(coc-fix-current)
+
+    """"""""""""" Coc-Git
+    " Undo git chunk (closest to linewise undo)
+    nmap <Leader>U :CocCommand git.chunkUndo<CR>
+    " Toggle GitGutter
+    nmap <Leader>og :CocCommand git.toggleGutters<CR>
+    " " navigate chunks of current buffer
+    nmap [c <Plug>(coc-git-prevchunk)
+    nmap ]c <Plug>(coc-git-nextchunk)
+    " show chunk diff at current position
+    nmap gs <Plug>(coc-git-chunkinfo)
+    " show commit contains current position
+    nmap gc <Plug>(coc-git-commit)
+    " " create text object for git chunks
+    omap ig <Plug>(coc-git-chunk-inner)
+    xmap ig <Plug>(coc-git-chunk-inner)
+    omap ag <Plug>(coc-git-chunk-outer)
+    xmap ag <Plug>(coc-git-chunk-outer)
+
+    " Play nicely with EasyMotion
+    autocmd User EasyMotionPromptBegin silent! CocDisable
+    autocmd User EasyMotionPromptEnd silent! CocEnable
+endif
 
 
 
