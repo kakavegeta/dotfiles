@@ -984,3 +984,4 @@ set cursorcolumn " Highlighter the vertical line"
 hi search cterm=underline ctermfg=white
 
 highlight PmenuSel cterm=underline,bold ctermfg=blue
+highlight Normal guibg=NONE ctermbg=NONE
