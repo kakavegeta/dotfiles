@@ -570,7 +570,7 @@ let g:ale_enabled = 1
 let g:ale_lint_on_enter = 0
 let g:ale_lint_on_save = 1
 let g:ale_lint_on_text_changed = 'never'
-let g:ale_fix_on_save = 0 " if set 1, insert to normal mode will be very slow
+let g:ale_fix_on_save = 1
 let g:ale_echo_msg_error_str = 'E'
 let g:ale_echo_msg_warning_str = 'W'
 let g:ale_echo_msg_format = '[%linter%] %s [%code%]'
@@ -586,7 +586,12 @@ let g:ale_fixers = {
     \   'json': ['prettier'],
     \   'yaml': ['prettier'],
     \}
-
+let g:ale_linters = {
+    \ 'cpp': ['clang'],
+    \ 'c' : ['clang'],
+    \ 'python' : ['pylint'],
+    \ 'javascript' : ['prettier']
+  \ }
 " -------------------------------------------------------------------------------
 " davidhalter/jedi-vim
 " -------------------------------------------------------------------------------
