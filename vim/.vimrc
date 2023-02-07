@@ -147,7 +147,7 @@ map <buffer> <S-e> :w<CR>:!/usr/bin/env python % <CR>
 function HeaderPython()
     call setline(1, "#!/usr/bin/env python")
     call append(1,  "# -*- coding: utf-8 -*-")
-    call append(2,  "# Tanky Woo @ " . strftime('%Y-%m-%d', localtime()))
+    call append(2,  "# Vegeka @ " . strftime('%Y-%m-%d', localtime()))
     normal G
     normal o
 endf
@@ -156,7 +156,7 @@ autocmd bufnewfile *.py call HeaderPython()
 " .sh file auto add header
 function HeaderBash()
     call setline(1, "#!/bin/bash")
-    call append(1,  "# Tanky Woo @ " . strftime('%Y-%m-%d', localtime()))
+    call append(1,  "# Vegeka @ " . strftime('%Y-%m-%d', localtime()))
     normal G
     normal o
 endf
@@ -326,9 +326,9 @@ Plug 'mattn/emmet-vim'
 Plug 'hail2u/vim-css3-syntax'
 Plug 'ap/vim-css-color'
 
-Plug 'pangloss/vim-javascript'  " improved indentation
-Plug 'ternjs/tern_for_vim'  " js autocompletion
-Plug 'Shutnik/jshint2.vim'
+" Plug 'pangloss/vim-javascript'  " improved indentation
+" Plug 'ternjs/tern_for_vim'  " js autocompletion
+" Plug 'Shutnik/jshint2.vim'
 
 " go
 Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
@@ -397,7 +397,6 @@ if isdirectory($HOME . "/.vim/plugged/coc.nvim")
        \'coc-git',
        \'coc-go',
        \'coc-pyright',
-       \'coc-clangd',
        \'coc-json',
        \'coc-lua',
        \'coc-prettier',
@@ -531,10 +530,10 @@ let g:fzf_layout = { 'down': '~20%' }
 " kien/rainbow_parentheses.vim
 " -------------------------------------------------------------------------------
 " always on
-au VimEnter *.py,*.js,*.html,*.css,*.sls,*.c, *.cpp RainbowParenthesesToggle
-au Syntax *.py,*.js,*.html,*.css,*.sls, *.c, *.cpp RainbowParenthesesLoadRound
-au Syntax *.py,*.js,*.html,*.css,*.sls, *.c, *.cpp RainbowParenthesesLoadSquare
-au Syntax *.py,*.js,*.html,*.css,*.sls, *.c, *.cpp RainbowParenthesesLoadBraces
+au VimEnter * RainbowParenthesesToggle
+au Syntax * RainbowParenthesesLoadRound
+au Syntax * RainbowParenthesesLoadSquare
+au Syntax * RainbowParenthesesLoadBraces
 
 " the outer layer is the last pair
 " remove black for dark terminal
@@ -555,7 +554,7 @@ let g:rbpt_colorpairs = [
     \ ['darkcyan',    'SeaGreen3'],
     \ ['red',         'firebrick3'],
     \ ]
-let g:rbpt_max = 15
+let g:rbpt_max = 16
 
 " -------------------------------------------------------------------------------
 " Yggdroot/indentLine
@@ -648,9 +647,9 @@ augroup END
 "----------------------------------------------------------------------------
 " Shutnik/jshint2.vim
 " ----------------------------------------------------------------------------
-let jshint2_save = 1
+" let jshint2_save = 1
 " jshint validation
-nnoremap <leader>j :JSHint<CR>
+" nnoremap <leader>j :JSHint<CR>
 
 " ----------------------------------------------------------------------------
 " plasticboy/vim-markdown
@@ -937,7 +936,7 @@ nnoremap <Leader>og :GitGutterToggle<CR>
 nnoremap <Leader>ol :ColorColumnToggle<CR>
 nnoremap <Leader>om :SignatureToggle<CR>
 nnoremap <Leader>on :LineNumberToggle<CR>
-nnoremap <Leader>op :RainbowToggle<CR>
+" nnoremap <Leader>op :RainbowToggle<CR>
 nnoremap <Leader>ot :Vista!!<CR>
 nnoremap <Leader>os :setlocal spell! spelllang=en_us<CR>
 nnoremap <Leader>u :MundoToggle<CR>
@@ -956,6 +955,8 @@ map <Leader>h <Plug>(easymotion-linebackward)
 map <Leader>j <Plug>(easymotion-j)
 map <Leader>k <Plug>(easymotion-k)
 map <Leader>l <Plug>(easymotion-lineforward)
+map <Leader>w <Plug>(easymotion-w)
+map <Leader>b <Plug>(easymotion-b)
 
 " <Leader>f{char} to move to {char}
 map  <Leader>f <Plug>(easymotion-bd-f)
@@ -1007,21 +1008,21 @@ if exists('g:coc_custom_config')
 
     """"""""""""" Coc-Git
     " Undo git chunk (closest to linewise undo)
-    nmap <Leader>U :CocCommand git.chunkUndo<CR>
-    " Toggle GitGutter
-    nmap <Leader>og :CocCommand git.toggleGutters<CR>
-    " " navigate chunks of current buffer
-    nmap [c <Plug>(coc-git-prevchunk)
-    nmap ]c <Plug>(coc-git-nextchunk)
-    " show chunk diff at current position
-    nmap gs <Plug>(coc-git-chunkinfo)
-    " show commit contains current position
-    nmap gc <Plug>(coc-git-commit)
-    " " create text object for git chunks
-    omap ig <Plug>(coc-git-chunk-inner)
-    xmap ig <Plug>(coc-git-chunk-inner)
-    omap ag <Plug>(coc-git-chunk-outer)
-    xmap ag <Plug>(coc-git-chunk-outer)
+    " nmap <Leader>U :CocCommand git.chunkUndo<CR>
+    " " Toggle GitGutter
+    " nmap <Leader>og :CocCommand git.toggleGutters<CR>
+    " " " navigate chunks of current buffer
+    " nmap [c <Plug>(coc-git-prevchunk)
+    " nmap ]c <Plug>(coc-git-nextchunk)
+    " " show chunk diff at current position
+    " nmap gs <Plug>(coc-git-chunkinfo)
+    " " show commit contains current position
+    " nmap gc <Plug>(coc-git-commit)
+    " " " create text object for git chunks
+    " omap ig <Plug>(coc-git-chunk-inner)
+    " xmap ig <Plug>(coc-git-chunk-inner)
+    " omap ag <Plug>(coc-git-chunk-outer)
+    " xmap ag <Plug>(coc-git-chunk-outer)
 
     " Play nicely with EasyMotion
     autocmd User EasyMotionPromptBegin silent! CocDisable
@@ -1051,7 +1052,7 @@ try
     " Below syntax will affect vim-airline statusbar; write colorscheme
     " directly is ok
     " autocmd BufEnter * colorscheme Tomorrow-Night-Bright
-    autocmd BufEnter *.md,*.mkd,*.markdown colorscheme badwolf
+    " autocmd BufEnter *.md,*.mkd,*.markdown colorscheme badwolf
 catch /^Vim\%((\a\+)\)\=:E185/
     colorscheme desert
 endtry
