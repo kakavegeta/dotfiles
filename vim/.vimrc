@@ -44,6 +44,7 @@ set expandtab  " Use the space to instead of tab
 set autoindent  " Copy indent from current line when starting a new line
 set smartindent
 set cindent
+autocmd Filetype c setlocal tabstop=2 softtabstop=2 shiftwidth=2
 
 " Seach and Match
 """""""""""""""""""""""""""""""""""""""""
@@ -401,6 +402,7 @@ if isdirectory($HOME . "/.vim/plugged/coc.nvim")
        \'coc-lua',
        \'coc-prettier',
        \'coc-highlight',
+       \'coc-clangd',
        \'coc-rls',
        \'coc-sh',
        \'coc-vimlsp',
