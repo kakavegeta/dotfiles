@@ -193,10 +193,10 @@ inoremap jj <Esc>
 inoremap jk <Esc>
 
 " quick save
-" nmap <Leader>w :w<CR>
-" nmap <Leader>q :q<CR>
-" nmap <Leader>wq :wq<CR>
-" nmap <Leader>Q :q!<CR>
+nmap <Leader><Leader>w :w<CR>
+nmap <Leader><Leader>q :q<CR>
+nmap <Leader><Leader>wq :wq<CR>
+nmap <Leader><Leader>Q :q!<CR>
 
 
 " ------------------------------------------------------------------------------
@@ -306,7 +306,7 @@ Plug 'ron89/thesaurus_query.vim'       " Synonym query
 " ------------------------------------------------------------------------------
 Plug 'w0rp/ale'
 Plug 'maximbaz/lightline-ale'          " Lightline + Ale
-Plug 'davidhalter/jedi-vim'
+" Plug 'davidhalter/jedi-vim'
 
 " python
 " Plug 'nvie/vim-flake8'
@@ -604,8 +604,8 @@ let g:ale_linters = {
 "   Renaming <leader>r
 "   Usages <leader>n (shows all the usages of a name)
 "   Open module, e.g. :Pyimport os (opens the os module)
-autocmd FileType python setlocal completeopt-=preview    " disable docstring
-let g:jedi#completions_command = "<C-N>"
+" autocmd FileType python setlocal completeopt-=preview    " disable docstring
+" let g:jedi#completions_command = "<C-N>"
 
 " -------------------------------------------------------------------------------
 " nvie/vim-flake8
