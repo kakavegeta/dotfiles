@@ -32,7 +32,7 @@ set linebreak           " Have lines wrap instead of continue off-screen
 set scrolloff=15        " Keep cursor in approximately the middle of the screen
 set updatetime=100      " Some plugins require fast updatetime
 set ttyfast             " Improve redrawing
-
+set shortmess-=S        " Show current match position
 
 " Tab and Indent
 """"""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -45,6 +45,7 @@ set autoindent  " Copy indent from current line when starting a new line
 set smartindent
 set cindent
 autocmd Filetype c setlocal tabstop=2 softtabstop=2 shiftwidth=2
+autocmd Filetype javascript setlocal tabstop=2 softtabstop=2 shiftwidth=2
 
 " Seach and Match
 """""""""""""""""""""""""""""""""""""""""
@@ -412,6 +413,7 @@ if isdirectory($HOME . "/.vim/plugged/coc.nvim")
        \'coc-xml',
        \'coc-css',
        \'coc-stylelint',
+       \'coc-html'
      \)
 endif
 
@@ -908,9 +910,6 @@ map <C-h> :History<CR>
 " <Nothing> -- vim-which-key
 nnoremap <silent> <leader> :WhichKey '<Space>'<CR>
 
-"  ;  --   FZF
-nmap <Leader>; :Buffers<CR>
-
 "  <Space>  --  <leader><leader> toggles between buffers
 nnoremap <Leader><Leader> <c-^>
 
@@ -919,6 +918,7 @@ nnoremap <Leader>- :sp<CR>
 nnoremap <Leader>\| :vsp<CR>
 
 "  e g H -- FZF
+nmap <Leader>; :Buffers<CR>
 nnoremap <Leader>g :Rg<CR>
 nnoremap <Leader>e :Files<CR>
 nnoremap <Leader>H :History<CR>
