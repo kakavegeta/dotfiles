@@ -46,7 +46,6 @@ set smartindent
 set cindent
 autocmd Filetype c setlocal tabstop=2 softtabstop=2 shiftwidth=2
 autocmd Filetype javascript setlocal tabstop=2 softtabstop=2 shiftwidth=2
-autocmd BufNewFile,BufRead *.tsx set filetype=typescript
 autocmd Filetype typescript setlocal tabstop=2 softtabstop=2 shiftwidth=2
 
 " Seach and Match
