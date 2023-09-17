@@ -16,7 +16,7 @@ if empty(glob(data_dir . '/autoload/plug.vim'))
   autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
 endif
 
-set nu  " Set the line number
+set nu rnu  " Set the line number
 syntax on  " Syntax highlighting
 "set autochdir  " Set the current dir as thr work dir
 filetype on  " File type detection
